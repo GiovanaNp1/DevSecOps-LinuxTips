@@ -96,7 +96,7 @@ jobs:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   dependency-check:
-    name: 📦 OWASP Dependency Check
+    name: OWASP Dependency Check
     needs: checkout-and-install
     runs-on: ubuntu-latest
 
@@ -109,7 +109,12 @@ jobs:
           project: "my-nodejs-app"
           path: "."                         
           format: "HTML"                    
-          out: "reports"                  
+          out: "reports"
+      - name: Upload do relatório como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: reports                  
 
   nodejsscan:
     name: NodeJsScan
