@@ -32,6 +32,9 @@ jobs:
         organization: giovananp1
         projectKey: DevSecOps
         token: ${{ secrets.SONAR_TOKEN }}
+        projectBaseDir: .
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     - name: Verificar vulnerabilidades com Snyk
       uses: snyk/actions@0.4.0
