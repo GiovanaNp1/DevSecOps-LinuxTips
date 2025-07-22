@@ -17,7 +17,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '22'
 
     - name: Instalar dependências
       run: npm ci
@@ -25,7 +25,6 @@ jobs:
     - name: Rodar testes e gerar cobertura
       run: |
         npm test -- --coverage
-        mkdir -p coverage && cp coverage/lcov.info coverage/
 
     - name: SonarCloud - Análise de Qualidade
       uses: SonarSource/sonarcloud-github-action@v2
@@ -33,9 +32,12 @@ jobs:
         organization: giovananp1
         projectKey: DevSecOps
         token: ${{ secrets.SONAR_TOKEN }}
+        projectBaseDir: .
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     - name: Verificar vulnerabilidades com Snyk
-      uses: snyk/actions/node@v1
+      uses: snyk/actions@0.4.0
       with:
         command: test
       env:
