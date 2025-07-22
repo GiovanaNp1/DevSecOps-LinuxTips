@@ -35,7 +35,7 @@ jobs:
         token: ${{ secrets.SONAR_TOKEN }}
 
     - name: Verificar vulnerabilidades com Snyk
-      uses: snyk/actions/node@v1
+      uses: snyk/actions@0.4.0
       with:
         command: test
       env:
