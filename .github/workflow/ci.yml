@@ -46,3 +46,8 @@ jobs:
       with:
         project: "my-nodejs-app"
         scanPath: "."
+        
+    - name: Verificar falhas de segurança no código (NodeJsScan)
+      run: |
+        pip install nodejsscan
+        nodejsscan -d ./src -o report.html
