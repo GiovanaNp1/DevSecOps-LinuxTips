@@ -96,20 +96,20 @@ jobs:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   dependency-check:
-  name: 📦 OWASP Dependency Check
-  needs: checkout-and-install
-  runs-on: ubuntu-latest
+    name: 📦 OWASP Dependency Check
+    needs: checkout-and-install
+    runs-on: ubuntu-latest
 
-  steps:
-    - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-    - name: Verificar dependências com OWASP Dependency Check
-      uses: dependency-check/Dependency-Check_Action@main
-      with:
-        project: "my-nodejs-app"
-        path: "."                         
-        format: "HTML"                    
-        out: "reports"                  
+      - name: Verificar dependências com OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: "my-nodejs-app"
+          path: "."                         
+          format: "HTML"                    
+          out: "reports"                  
 
   nodejsscan:
     name: NodeJsScan
