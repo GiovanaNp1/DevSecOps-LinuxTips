@@ -1,0 +1,48 @@
+name: CI DevSecOps
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  devsecops-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Instalar dependências
+      run: npm ci
+
+    - name: Rodar testes e gerar cobertura
+      run: |
+        npm test -- --coverage
+        mkdir -p coverage && cp coverage/lcov.info coverage/
+
+    - name: SonarCloud - Análise de Qualidade
+      uses: SonarSource/sonarcloud-github-action@v2
+      with:
+        organization: giovananp1
+        projectKey: DevSecOps
+        token: ${{ secrets.SONAR_TOKEN }}
+
+    - name: Verificar vulnerabilidades com Snyk
+      uses: snyk/actions/node@v1
+      with:
+        command: test
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+    - name: Verificar dependências com OWASP Dependency Check
+      uses: dependency-check/Dependency-Check_Action@main
+      with:
+        project: "my-nodejs-app"
+        scanPath: "."
