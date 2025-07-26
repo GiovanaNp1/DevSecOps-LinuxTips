@@ -1,19 +1,25 @@
 FROM node:22-alpine AS build
 
-# WORKDIR /app
+# Usa o diretório raiz do container
+WORKDIR /
 
+# Copia arquivos de dependências
 COPY package*.json ./
 RUN npm ci
 
+# Copia todo o restante do projeto
 COPY . .
 
+# Roda build apenas se existir
 RUN npm run build || echo "sem etapa build"
 
+# ====== Fase final ======
 FROM node:22-alpine
 
-# WORKDIR /app
+WORKDIR /
 
-COPY --from=build .
+# Copia tudo do estágio de build
+COPY --from=build / .
 
 ENV NODE_ENV=production
 
