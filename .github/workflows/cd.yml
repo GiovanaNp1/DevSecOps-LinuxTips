@@ -1,0 +1,30 @@
+name: CD Deploy Heroku
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Login no Container Registry do Heroku
+        run: echo "${{ secrets.HEROKU_API_KEY }}" | docker login --username=_ --password-stdin registry.heroku.com
+
+      - name: Build da imagem Docker para Heroku
+        run: docker build -t registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web .
+
+      - name: Push da imagem Docker
+        run: docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
+
+      - name: Release da app no Heroku
+        run: heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}

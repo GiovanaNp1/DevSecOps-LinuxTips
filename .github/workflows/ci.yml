@@ -7,7 +7,9 @@ on:
     branches: [ "main" ]
 
 jobs:
-  devsecops-pipeline:
+
+  checkout-and-install:
+    name: Checkout e Instalação
     runs-on: ubuntu-latest
 
     steps:
@@ -22,11 +24,47 @@ jobs:
     - name: Instalar dependências
       run: npm ci
 
+    - name: Cache dependências
+      uses: actions/cache@v4
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-npm-
+
+  tests:
+    name: Testes e Cobertura
+    needs: checkout-and-install
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+
+    - name: Instalar dependências
+      run: npm ci
+
     - name: Rodar testes e gerar cobertura
       run: |
         npm test -- --coverage
 
-    - name: SonarCloud - Análise de Qualidade
+  sonarcloud:
+    name: SonarCloud
+    needs: tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+
+    - name: Instalar dependências
+      run: npm ci
+
+    - name: Rodar SonarCloud
       uses: SonarSource/sonarcloud-github-action@v2
       with:
         organization: giovananp1
@@ -36,6 +74,20 @@ jobs:
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+  snyk:
+    name: Snyk Scan
+    needs: checkout-and-install
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+
+    - name: Instalar dependências
+      run: npm ci
+
     - name: Verificar vulnerabilidades com Snyk
       uses: snyk/actions@0.4.0
       with:
@@ -43,13 +95,36 @@ jobs:
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-    - name: Verificar dependências com OWASP Dependency Check
-      uses: dependency-check/Dependency-Check_Action@main
-      with:
-        project: "my-nodejs-app"
-        scanPath: "."
-        
-    - name: Verificar falhas de segurança no código (NodeJsScan)
+  dependency-check:
+    name: OWASP Dependency Check
+    needs: checkout-and-install
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verificar dependências com OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: "my-nodejs-app"
+          path: "."                         
+          format: "HTML"                    
+          out: "reports"
+      - name: Upload do relatório como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: reports                  
+
+  nodejsscan:
+    name: NodeJsScan
+    needs: checkout-and-install
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Instalar NodeJsScan e rodar análise
       run: |
         pip install nodejsscan
         nodejsscan -d ./src -o report.html
