@@ -27,6 +27,9 @@ jobs:
       - name: Instalar CLI do Heroku
         run: curl https://cli-assets.heroku.com/install.sh | sh
 
+      - name: Login CLI do Heroku
+        run: echo "${{ secrets.HEROKU_API_KEY }}" | heroku auth:token > /dev/null || true
+
       - name: Definir stack como container
         run: heroku stack:set container --app ${{ secrets.HEROKU_APP_NAME }}
         env:
