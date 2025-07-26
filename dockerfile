@@ -19,7 +19,7 @@ FROM node:22-alpine
 WORKDIR /
 
 # Copia tudo do estágio de build
-COPY --from=build / .
+COPY . .
 
 ENV NODE_ENV=production
 
