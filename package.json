@@ -19,7 +19,7 @@
     "swagger-autogen": "^2.23.7"
   },
   "dependencies": {
-    "axios": "^1.9.0",
+    "axios": "^1.11.0",
     "body-parser": "^2.2.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
