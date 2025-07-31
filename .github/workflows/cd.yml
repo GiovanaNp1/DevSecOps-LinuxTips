@@ -18,9 +18,6 @@ jobs:
       - name: Instalar Heroku CLI
         run: curl https://cli-assets.heroku.com/install.sh | sh
 
-      - name: Login Heroku
-        run: echo "${{ secrets.HEROKU_API_KEY }}" | heroku login --apikey
-
       - name: Login no Container Registry do Heroku
         run: heroku container:login
 
