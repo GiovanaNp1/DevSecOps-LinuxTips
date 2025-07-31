@@ -15,16 +15,14 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Instalar CLI do Heroku
+      - name: Instalar Heroku CLI
         run: curl https://cli-assets.heroku.com/install.sh | sh
 
-      - name: Listar apps Heroku (debug)
-        run: heroku apps
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      - name: Login Heroku
+        run: echo "${{ secrets.HEROKU_API_KEY }}" | heroku login --apikey
 
       - name: Login no Container Registry do Heroku
-        run: echo "${{ secrets.HEROKU_API_KEY }}" | docker login --username=_ --password-stdin registry.heroku.com
+        run: heroku container:login
 
       - name: Build da imagem Docker
         run: docker build -t registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web .
@@ -37,7 +35,8 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
-      - name: Release da app no Heroku
+      - name: Push da imagem usando Heroku CLI
+        run: heroku container:push web --app ${{ secrets.HEROKU_APP_NAME }}
+
+      - name: Release da aplicação
         run: heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
