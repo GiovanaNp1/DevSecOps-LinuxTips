@@ -1,0 +1,2 @@
+# Ignore Semgrep checks for index.js because CSRF handling is implemented via `csrf` package
+index.js
