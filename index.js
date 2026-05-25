@@ -26,22 +26,32 @@ console.log('teste')
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-// Simple double-submit cookie CSRF protection (no external csurf dependency)
-const crypto = require('crypto');
-function generateCsrfToken() {
-    return crypto.randomBytes(24).toString('hex');
+// use `csrf` package to generate and verify tokens (secret stored in cookie)
+const Tokens = require('csrf');
+const tokens = new Tokens();
+
+// middleware to ensure secret cookie exists
+function ensureCsrfSecret(req, res, next) {
+    if (!req.cookies['csrf-secret']) {
+        const secret = tokens.secretSync();
+        // not httpOnly so client can read the token via cookie if needed
+        res.cookie('csrf-secret', secret, { httpOnly: false });
+        req.csrfSecret = secret;
+    } else {
+        req.csrfSecret = req.cookies['csrf-secret'];
+    }
+    return next();
 }
 
-// middleware to validate double-submit token
-function validateDoubleSubmitCsrf(req, res, next) {
+// middleware to validate token on mutating requests
+function validateCsrfToken(req, res, next) {
     const methodsToProtect = ['POST', 'PUT', 'PATCH', 'DELETE'];
     if (!methodsToProtect.includes(req.method)) return next();
 
-    const cookieToken = req.cookies['XSRF-TOKEN'];
+    const secret = req.cookies['csrf-secret'];
     const headerToken = req.get('x-csrf-token') || req.get('csrf-token') || req.get('x-xsrf-token');
-    if (!cookieToken || !headerToken || cookieToken !== headerToken) {
-        return res.status(403).json({ error: 'Invalid CSRF token' });
-    }
+    if (!secret || !headerToken) return res.status(403).json({ error: 'Invalid CSRF token' });
+    if (!tokens.verify(secret, headerToken)) return res.status(403).json({ error: 'Invalid CSRF token' });
     return next();
 }
 
@@ -64,16 +74,19 @@ Logger.useDefaults();
     // Public login route - issue auth but skip CSRF here (placed before CSRF middleware)
     app.post('/login', authorization);
 
-    // Route to fetch CSRF token for clients (sets XSRF-TOKEN cookie and returns the token)
+    // Ensure CSRF secret cookie exists for clients
+    app.use(ensureCsrfSecret);
+
+    // Route to fetch CSRF token for clients (generate token from secret and return it)
     app.get('/csrf-token', (req, res) => {
-        const token = generateCsrfToken();
-        // set cookie for double-submit strategy; secure flag should be enabled in prod
+        const secret = req.csrfSecret || req.cookies['csrf-secret'];
+        const token = tokens.create(secret);
         res.cookie('XSRF-TOKEN', token, { httpOnly: false });
         res.json({ csrfToken: token });
     });
 
-    // Apply double-submit CSRF validation to modifying routes
-    app.use(validateDoubleSubmitCsrf);
+    // Apply CSRF token validation to modifying requests
+    app.use(validateCsrfToken);
 
     // Protected application routes (these come after CSRF middleware)
     app.use('/client', authenticate, clientRoutes(clientController));
