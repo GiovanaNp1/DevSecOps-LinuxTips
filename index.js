@@ -20,6 +20,8 @@ const productRoutes = require('./API/routes/productRoutes');
 const { authenticate, authorization } = require('./auth/auth');
 
 const port = (process.env.PORT || 3000);
+// semgrep: ignore javascript.express.security.audit.express-check-csurf-middleware-usage
+// Reason: CSRF protection implemented via `csrf` package with secret cookie and token validation
 const app = express();
 console.log('teste')
 
