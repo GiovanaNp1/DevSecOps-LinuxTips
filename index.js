@@ -5,7 +5,6 @@ const ConnectDatabase = require('./config/mongoose');
 const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./swagger-output.json');
 const cookieParser = require('cookie-parser');
-const csurf = require('csurf');
 
 require('dotenv').config()
 
@@ -27,8 +26,24 @@ console.log('teste')
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-// configure CSRF protection using cookies
-const csrfProtection = csurf({ cookie: true });
+// Simple double-submit cookie CSRF protection (no external csurf dependency)
+const crypto = require('crypto');
+function generateCsrfToken() {
+    return crypto.randomBytes(24).toString('hex');
+}
+
+// middleware to validate double-submit token
+function validateDoubleSubmitCsrf(req, res, next) {
+    const methodsToProtect = ['POST', 'PUT', 'PATCH', 'DELETE'];
+    if (!methodsToProtect.includes(req.method)) return next();
+
+    const cookieToken = req.cookies['XSRF-TOKEN'];
+    const headerToken = req.get('x-csrf-token') || req.get('csrf-token') || req.get('x-xsrf-token');
+    if (!cookieToken || !headerToken || cookieToken !== headerToken) {
+        return res.status(403).json({ error: 'Invalid CSRF token' });
+    }
+    return next();
+}
 
 Logger.useDefaults();
 
@@ -49,13 +64,16 @@ Logger.useDefaults();
     // Public login route - issue auth but skip CSRF here (placed before CSRF middleware)
     app.post('/login', authorization);
 
-    // Apply CSRF protection globally for remaining routes
-    app.use(csrfProtection);
-
-    // Route to fetch CSRF token for clients (e.g. single page apps)
+    // Route to fetch CSRF token for clients (sets XSRF-TOKEN cookie and returns the token)
     app.get('/csrf-token', (req, res) => {
-        res.json({ csrfToken: req.csrfToken() });
+        const token = generateCsrfToken();
+        // set cookie for double-submit strategy; secure flag should be enabled in prod
+        res.cookie('XSRF-TOKEN', token, { httpOnly: false });
+        res.json({ csrfToken: token });
     });
+
+    // Apply double-submit CSRF validation to modifying routes
+    app.use(validateDoubleSubmitCsrf);
 
     // Protected application routes (these come after CSRF middleware)
     app.use('/client', authenticate, clientRoutes(clientController));
