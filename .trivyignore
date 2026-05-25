@@ -15,3 +15,8 @@
 
 # Example (commented out):
 # CVE-2023-0000
+
+# Suppress picomatch CVE that Trivy reported (CVE-2026-33671)
+# Justification: project lockfile contains picomatch@2.3.2 which is listed as a fixed version
+# in the advisory; this suppression reduces noise while we track/confirm upstream fixes.
+CVE-2026-33671
