@@ -1,4 +1,4 @@
-const Product = require("../../domain/Models/Product");
+const Product = require('../../domain/Models/Product');
 
 class ClientRepository {
     async create (request){

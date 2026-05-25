@@ -16,7 +16,7 @@ class ClientController {
         try {
             const user = await this.ClientUseCase.get(req);
             if (!user) {
-                return res.status(404).json({ "msg": "usuario não encontrado" });
+                return res.status(404).json({ 'msg': 'usuario não encontrado' });
             }
             res.status(200).json(user);
         } catch (err) {
@@ -46,7 +46,7 @@ class ClientController {
         try {
             const updatedClient = await this.ClientUseCase.update(req);
             if (!updatedClient) {
-                return res.status(404).json({ msg: "Cliente não encontrado" });
+                return res.status(404).json({ msg: 'Cliente não encontrado' });
             }
             res.status(200).json(updatedClient);
         } catch (err) {

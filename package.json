@@ -6,13 +6,16 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "swagger": "node swagger.js",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "eslint": "^8.50.0",
     "jest": "^29.7.0",
     "nodemon": "^3.1.10",
     "supertest": "^7.1.1",

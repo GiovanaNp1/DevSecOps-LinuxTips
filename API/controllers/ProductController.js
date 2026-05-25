@@ -17,7 +17,7 @@ class ClientController {
             console.log(req.params)
             const user = await this.ProductUseCase.get(req);
             if (!user) {
-                return res.status(404).json({ "msg": "produto não encontrado" });
+                return res.status(404).json({ 'msg': 'produto não encontrado' });
             }
             res.status(200).json(user);
         } catch (err) {
@@ -47,7 +47,7 @@ class ClientController {
         try {
             const updatedProduct = await this.ProductUseCase.update(req.params._id, req.body);
             if (!updatedProduct) {
-                return res.status(404).json({ msg: "Cliente não encontrado" });
+                return res.status(404).json({ msg: 'Cliente não encontrado' });
             }
             res.status(200).json(updatedProduct);
         } catch (err) {

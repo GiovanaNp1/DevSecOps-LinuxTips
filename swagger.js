@@ -2,9 +2,9 @@ const swaggerAutogen = require('swagger-autogen')({ openapi: '3.0.0' });
 
 const doc = {
     info: {
-        version: "1.0.0",
-        title: "My API",
-        description: "Some description..."
+        version: '1.0.0',
+        title: 'My API',
+        description: 'Some description...'
     },
     servers: [
         {
@@ -14,27 +14,27 @@ const doc = {
     components: {
         schemas: {
             Product: {
-                type: "object",
-                required: ["price", "title", "reviewScore"],
+                type: 'object',
+                required: ['price', 'title', 'reviewScore'],
                 properties: {
                     price: {
-                        type: "number",
+                        type: 'number',
                         example: 199.99
                     },
                     image: {
-                        type: "string",
-                        example: "https://example.com/images/product123.jpg"
+                        type: 'string',
+                        example: 'https://example.com/images/product123.jpg'
                     },
                     brand: {
-                        type: "string",
-                        example: "Nike"
+                        type: 'string',
+                        example: 'Nike'
                     },
                     title: {
-                        type: "string",
-                        example: "Tênis de Corrida Air Max"
+                        type: 'string',
+                        example: 'Tênis de Corrida Air Max'
                     },
                     reviewScore: {
-                        type: "number",
+                        type: 'number',
                         example: 4.5
                     }
                 }

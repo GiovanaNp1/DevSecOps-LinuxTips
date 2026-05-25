@@ -1,4 +1,4 @@
-const Client = require("../../domain/Models/Client");
+const Client = require('../../domain/Models/Client');
 
 class ClientRepository {
     async create (request){

@@ -20,8 +20,8 @@ class ProductUseCase {
 
      async update(data) {
         const product = await this.productRepository.get(data);
-        if (!product) throw new Error("Produto não encontrado");
-        return await this.productRepository.update(params, body);
+        if (!product) throw new Error('Produto não encontrado');
+        return await this.productRepository.update();
     }
 }
 
