@@ -1,0 +1,17 @@
+# .trivyignore
+# Use this file to ignore specific Trivy findings (CVE ids or package-specific entries).
+# Lines starting with '#' are comments. To ignore an item, add it on its own line.
+# Examples:
+# Ignore a specific CVE globally:
+# CVE-2024-12345
+# Ignore a vulnerability for a specific package (format: <pkg-type>:<pkg-name>@<version> <VULN-ID>)
+# e.g. to ignore a node package vulnerability in package-lock.json:
+# node-pkg:package-lock.json lodash@4.17.21 CVE-2020-8203
+# Ignore an OS package vulnerability (format: <os>:<pkg-name> <VULN-ID>)
+# alpine:musl CVE-2022-1234
+
+# NOTE: It's safer to fix/upgrade vulnerable packages instead of ignoring.
+# Add entries below to silence known/accepted risks.
+
+# Example (commented out):
+# CVE-2023-0000
