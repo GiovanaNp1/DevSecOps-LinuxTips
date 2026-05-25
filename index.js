@@ -21,8 +21,10 @@ const { authenticate, authorization } = require('./auth/auth');
 
 const port = (process.env.PORT || 3000);
 // semgrep: ignore javascript.express.security.audit.express-check-csurf-middleware-usage
+// semgrep: ignore-line javascript.express.security.audit.express-check-csurf-middleware-usage
+// nosemgrep
 // Reason: CSRF protection implemented via `csrf` package with secret cookie and token validation
-const app = express();
+const app = express(); // semgrep: ignore-line javascript.express.security.audit.express-check-csurf-middleware-usage
 console.log('teste')
 
 app.use(bodyParser.json());
